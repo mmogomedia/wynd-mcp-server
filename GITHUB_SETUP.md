@@ -13,7 +13,7 @@ This guide explains how to set up the WYND MCP Server as a public GitHub reposit
 
 ### 2. Initialize Git Repository
 ```bash
-cd /home/tawanda/.local/share/Kilo-Code/MCP/wynd-server
+cd /home/tawanda/dev/wynd/mcp
 git init
 git add .
 git commit -m "Initial commit: WYND MCP Server package"

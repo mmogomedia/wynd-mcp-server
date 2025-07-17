@@ -1,20 +1,26 @@
 # WYND MCP Server
 
-A Model Context Protocol (MCP) server that provides tools and resources for interacting with the WYND Project Management Software. This server enables AI assistants to manage workspaces, projects, tasks, user profiles, and prompt libraries programmatically.
+A Model Context Protocol (MCP) server that provides tools and resources for interacting with the WYND Project Management Software. This server enables AI assistants to manage workspaces, projects, tasks, documents, and error tracking programmatically.
 
-## Features
+## 🚀 Features
 
 - **Workspace Management**: Create, update, and manage workspaces
 - **Project Management**: Full CRUD operations for projects
-- **Task Management**: Create, assign, and track tasks with subtask support
-- **User Management**: Profile management and team collaboration
+  - **Default Project**: Configure a default project for operations
+  - **Workspace Inheritance**: New projects inherit workspace from default project
+- **Task Management**: Create, assign, and track tasks
 - **Document Management**: Create and manage project documentation
-- **Prompt Library**: Manage AI prompts with categories, collections, and sharing
-- **Activity Tracking**: Log activities and track errors
-- **Analytics**: Generate reports and workspace statistics
-- **Agent Management**: Create and manage AI agents and automations
+- **Error Tracking**: Track and manage application errors
+- **TypeScript Support**: Fully typed API and resources
+- **Modular Architecture**: Clean separation of concerns
+- **Environment Configuration**: Easy configuration via environment variables
 
-## Installation
+## 📦 Installation
+
+### Prerequisites
+
+- Node.js 18 or higher
+- npm or yarn
 
 ### Via NPM (Recommended)
 
@@ -22,32 +28,125 @@ A Model Context Protocol (MCP) server that provides tools and resources for inte
 npm install -g @mmogomedia/wynd-mcp-server
 ```
 
-### Via NPX (No Installation Required)
-
-```bash
-npx @mmogomedia/wynd-mcp-server
-```
-
 ### From Source
 
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/mmogomedia/wynd-mcp-server.git
+   cd wynd-mcp-server
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Build the project:
+   ```bash
+   npm run build
+   ```
+
+## ⚙️ Configuration
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Update the `.env` file with your configuration:
+   ```env
+   # API Configuration
+   WYND_API_URL=https://wynd.mmogomedia.com
+   WYND_API_TOKEN=your_api_token_here
+   
+   # Server Configuration
+   PORT=3000
+   NODE_ENV=development
+   LOG_LEVEL=info
+   
+   # Timeout for API requests in milliseconds
+   API_TIMEOUT=10000
+
+   # Default Project (optional)
+   # When set, this project ID will be used as the default for operations
+   # that require a project context when none is specified.
+   # Example: DEFAULT_PROJECT_ID=proj_1234567890
+   ```
+
+### Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `WYND_API_URL` | No | `https://wynd.mmogomedia.com` | WYND API base URL |
+| `WYND_API_TOKEN` | Yes | - | Your WYND API authentication token |
+| `PORT` | No | `3000` | Port to run the server on |
+| `NODE_ENV` | No | `development` | Node.js environment |
+| `LOG_LEVEL` | No | `info` | Logging level |
+| `API_TIMEOUT` | No | `10000` | API request timeout in ms |
+
+## 🚀 Usage
+
+### Development
+
 ```bash
-git clone https://github.com/mmogomedia/wynd-mcp-server.git
-cd mcp-server
-npm install
+# Start in development mode with hot-reload
+npm run dev
+```
+
+### Production
+
+```bash
+# Build the project
 npm run build
+
+# Start in production mode
 npm start
 ```
 
-## Configuration
+## 🏗️ Project Structure
 
-The server requires the following environment variables:
+```
+wynd-mcp/
+├── src/
+│   ├── api/                  # API client and endpoints
+│   │   ├── client.ts         # Axios client configuration
+│   │   ├── endpoints/        # API endpoint definitions
+│   │   └── types/            # TypeScript type definitions
+│   ├── config/               # Configuration management
+│   ├── server/               # MCP server implementation
+│   │   ├── resources/        # Resource handlers
+│   │   └── index.ts          # Server setup and initialization
+│   └── utils/                # Utility functions
+│       └── logger.ts         # Logging utility
+├── .env.example             # Example environment variables
+├── package.json             # Project configuration
+└── tsconfig.json            # TypeScript configuration
+```
 
-- `WYND_API_TOKEN` (required): Your WYND API authentication token
-- `WYND_API_URL` (optional): WYND API base URL (defaults to `https://wynd.mmogomedia.com`)
+## 📚 API Resources
 
-### Getting Your API Token
+The following resources are available through the MCP server:
 
-1. Log in to your WYND account at [https://wynd.mmogomedia.com](https://wynd.mmogomedia.com)
+- `wynd://workspaces` - Workspace management
+- `wynd://projects` - Project management
+- `wynd://documents` - Document management
+- `wynd://errors` - Error tracking
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📧 Contact
+
+For questions or support, please contact [support@wynd.com](mailto:support@wynd.com)
 2. Navigate to Settings > API Tokens
 3. Generate a new token with appropriate permissions
 4. Copy the token for use in your environment
