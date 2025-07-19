@@ -32,7 +32,7 @@ export interface Workspace extends BaseEntity {
 export interface Project extends BaseEntity {
   title: string;
   description: string | null;
-  status: 'active' | 'archived' | 'completed';
+  status: 'active' | 'archived' | 'done';
   owner_id: string;
   workspace_id: string | null;
 }
@@ -125,6 +125,7 @@ export interface PaginationParams {
   limit?: number;
   sort_by?: string;
   sort_order?: 'asc' | 'desc';
+  project_id?: string;
 }
 
 export interface FilterParams {

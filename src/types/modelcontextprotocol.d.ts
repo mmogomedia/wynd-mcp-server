@@ -6,6 +6,7 @@ declare module '@modelcontextprotocol/sdk' {
 }
 
 declare module '@modelcontextprotocol/sdk/dist/esm/server/index.js' {
+  export * from '@modelcontextprotocol/sdk';
   export class Server {
     constructor(options: { 
       name: string; 

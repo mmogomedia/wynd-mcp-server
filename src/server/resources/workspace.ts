@@ -1,6 +1,7 @@
 import { Resource } from '@modelcontextprotocol/sdk';
 import { api } from '../../api/endpoints/index.js';
 import { Workspace, ListParams } from '../../api/types/index.js';
+import { config } from '../../config/index.js';
 
 /**
  * Workspace resource handler for the MCP server

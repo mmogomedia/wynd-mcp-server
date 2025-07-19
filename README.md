@@ -67,10 +67,11 @@ npm install -g @mmogomedia/wynd-mcp-server
    # Timeout for API requests in milliseconds
    API_TIMEOUT=10000
 
-   # Default Project (optional)
-   # When set, this project ID will be used as the default for operations
+   # Default Project (Required)
+   # This project ID will be used as the default for operations
    # that require a project context when none is specified.
-   # Example: DEFAULT_PROJECT_ID=proj_1234567890
+   # This should be set to your main project ID.
+   DEFAULT_PROJECT_ID=your_project_id_here
    ```
 
 ### Environment Variables
@@ -83,6 +84,7 @@ npm install -g @mmogomedia/wynd-mcp-server
 | `NODE_ENV` | No | `development` | Node.js environment |
 | `LOG_LEVEL` | No | `info` | Logging level |
 | `API_TIMEOUT` | No | `10000` | API request timeout in ms |
+| `DEFAULT_PROJECT_ID` | Yes | - | Default project ID for operations requiring project context |
 
 ## 🚀 Usage
 
@@ -147,6 +149,23 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📧 Contact
 
 For questions or support, please contact [support@wynd.com](mailto:support@wynd.com)
+
+## 🔧 Getting Your Project ID
+
+To find your project ID:
+
+1. Log into your WYND account at https://wynd.mmogomedia.com
+2. Navigate to the project you want to use as default
+3. The project ID is displayed in the URL: `https://wynd.mmogomedia.com/projects/{project-id}`
+4. Copy this ID and use it as your `DEFAULT_PROJECT_ID`
+
+### Why is DEFAULT_PROJECT_ID Required?
+
+The `DEFAULT_PROJECT_ID` is required because many operations in WYND require a project context. When you don't specify a project for an operation, the system uses this default project ID. This ensures that tasks, documents, and other resources are created in the correct project by default.
+
+## 🔑 Getting Your API Token
+
+1. Log into your WYND account at https://wynd.mmogomedia.com
 2. Navigate to Settings > API Tokens
 3. Generate a new token with appropriate permissions
 4. Copy the token for use in your environment
@@ -162,9 +181,10 @@ Add the following to your Claude Desktop MCP settings file:
   "mcpServers": {
     "wynd": {
       "command": "npx",
-      "args": ["@mmogomedia/wynd-mcp-server"],
+      "args": ["-y", "@mmogomedia/wynd-mcp-server"],
       "env": {
-        "WYND_API_TOKEN": "your-api-token-here"
+        "WYND_API_TOKEN": "your-api-token-here",
+        "DEFAULT_PROJECT_ID": "your-project-id-here"
       }
     }
   }
@@ -176,7 +196,7 @@ Add the following to your Claude Desktop MCP settings file:
 The server can be used with any MCP-compatible client by running:
 
 ```bash
-WYND_API_TOKEN=your-token-here npx @mmogomedia/wynd-mcp-server
+WYND_API_TOKEN=your-token-here DEFAULT_PROJECT_ID=your-project-id-here npx @mmogomedia/wynd-mcp-server
 ```
 
 ## Available Tools

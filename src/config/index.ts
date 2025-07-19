@@ -12,7 +12,7 @@ const envSchema = z.object({
   PORT: z.string().default('3000'),
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly']).default('info'),
   API_TIMEOUT: z.string().default('10000'), // in milliseconds
-  DEFAULT_PROJECT_ID: z.string().optional(), // Default project ID for operations
+  DEFAULT_PROJECT_ID: z.string().min(1, 'DEFAULT_PROJECT_ID is required'), // Default project ID for operations
 });
 
 // Parse environment variables

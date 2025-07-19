@@ -1,4 +1,5 @@
 import { wyndApi } from '../client.js';
+import { config } from '../../config/index.js';
 import type {
   Workspace,
   Project,
@@ -64,14 +65,26 @@ export const projects = {
  * Tasks API endpoints
  */
 export const tasks = {
-  list: (params?: ListParams): Promise<ListResponse<Task>> => 
-    wyndApi.get('/api/tasks', { params }),
+  list: (params?: ListParams): Promise<ListResponse<Task>> => {
+    // Always filter by default project unless explicitly overridden
+    const filteredParams = {
+      ...params,
+      project_id: params?.project_id || config.project.defaultProjectId,
+    };
+    return wyndApi.get('/api/tasks', { params: filteredParams });
+  },
     
   get: (id: string): Promise<Task> => 
     wyndApi.get(`/api/tasks/${id}`),
     
-  create: (data: Omit<Task, 'id' | 'created_at' | 'updated_at'>): Promise<Task> => 
-    wyndApi.post('/api/tasks', data),
+  create: (data: Omit<Task, 'id' | 'created_at' | 'updated_at'>): Promise<Task> => {
+    // Ensure task is created in the default project if no project_id is specified
+    const taskData = {
+      ...data,
+      project_id: data.project_id || config.project.defaultProjectId,
+    };
+    return wyndApi.post('/api/tasks', taskData);
+  },
     
   update: (id: string, data: Partial<Omit<Task, 'id' | 'created_at' | 'updated_at'>>): Promise<Task> => 
     wyndApi.put(`/api/tasks/${id}`, data),
@@ -84,14 +97,26 @@ export const tasks = {
  * Documents API endpoints
  */
 export const documents = {
-  list: (params?: ListParams): Promise<ListResponse<Document>> => 
-    wyndApi.get('/api/documents', { params }),
+  list: (params?: ListParams): Promise<ListResponse<Document>> => {
+    // Always filter by default project unless explicitly overridden
+    const filteredParams = {
+      ...params,
+      project_id: params?.project_id || config.project.defaultProjectId,
+    };
+    return wyndApi.get('/api/documents', { params: filteredParams });
+  },
     
   get: (id: string): Promise<Document> => 
     wyndApi.get(`/api/documents/${id}`),
     
-  create: (data: Omit<Document, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>): Promise<Document> => 
-    wyndApi.post('/api/documents', data),
+  create: (data: Omit<Document, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>): Promise<Document> => {
+    // Ensure document is created in the default project if no project_id is specified
+    const documentData = {
+      ...data,
+      project_id: data.project_id || config.project.defaultProjectId,
+    };
+    return wyndApi.post('/api/documents', documentData);
+  },
     
   update: (id: string, data: Partial<Omit<Document, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>>): Promise<Document> => 
     wyndApi.put(`/api/documents/${id}`, data),

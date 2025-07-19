@@ -2,6 +2,8 @@ import { WorkspaceResource } from './resources/workspace.js';
 import { ProjectResource } from './resources/project.js';
 import { DocumentResource } from './resources/document.js';
 import { ErrorResource } from './resources/error.js';
+import { TaskResource } from './resources/task.js';
+import { ProjectTemplateResource } from './resources/project_template.js';
 import { HttpServerTransport } from './transport/http.js';
 import { config } from '../config/index.js';
 import logger from '../utils/logger.js';
@@ -50,20 +52,20 @@ async function loadSdk(): Promise<{
   try {
     logger.info('Attempting to load MCP SDK...');
     
-    // Import the SDK using the simplified path from our type declarations
-    const sdk = await import('@modelcontextprotocol/sdk');
+    // @ts-ignore
+    const sdk = await import('@modelcontextprotocol/sdk/server/index.js');
+    // @ts-ignore
+    const stdioSdk = await import('@modelcontextprotocol/sdk/server/stdio.js');
     
     // Extract the Server class with proper type checking
-    const ServerClass = sdk.Server || 
-                       (sdk.default && sdk.default.Server);
+    const ServerClass = sdk.Server;
     
     if (!isServerConstructor(ServerClass)) {
       throw new Error('Invalid Server class in @modelcontextprotocol/sdk');
     }
     
     // Extract the StdioServerTransport class with proper type checking
-    const TransportClass = sdk.StdioServerTransport || 
-                          (sdk.default && sdk.default.StdioServerTransport);
+    const TransportClass = stdioSdk.StdioServerTransport;
     
     if (!isTransportConstructor(TransportClass)) {
       throw new Error('Invalid StdioServerTransport in @modelcontextprotocol/sdk');
@@ -121,8 +123,8 @@ class WyndMcpServer {
         
         // Initialize the MCP server
         this.server = new this.serverClass({
-          name: 'wynd-mcp-server',
-          version: '1.0.0',
+          name: 'wynd',
+          version: '1.1.0',
           description: 'WYND Project Management MCP Server - Provides tools and resources for interacting with the WYND Project Management Software',
         });
         
@@ -149,6 +151,8 @@ class WyndMcpServer {
       const projectResource = new ProjectResource();
       const documentResource = new DocumentResource();
       const errorResource = new ErrorResource();
+      const taskResource = new TaskResource();
+      const projectTemplateResource = new ProjectTemplateResource();
       
       // Check if the server has a resource method
       if (typeof this.server.resource === 'function') {
@@ -156,19 +160,25 @@ class WyndMcpServer {
         this.server.resource(projectResource.uri, projectResource);
         this.server.resource(documentResource.uri, documentResource);
         this.server.resource(errorResource.uri, errorResource);
+        this.server.resource(taskResource.uri, taskResource);
+        this.server.resource(projectTemplateResource.uri, projectTemplateResource);
       } else {
         // Fallback to direct property assignment if resource method doesn't exist
         this.server.workspaces = workspaceResource;
         this.server.projects = projectResource;
         this.server.documents = documentResource;
         this.server.errors = errorResource;
+        this.server.tasks = taskResource;
+        this.server.projectTemplates = projectTemplateResource;
       }
       
       logger.info('Registered resources:', {
         workspaces: workspaceResource.uri,
         projects: projectResource.uri,
         documents: documentResource.uri,
-        errors: errorResource.uri
+        errors: errorResource.uri,
+        tasks: taskResource.uri,
+        projectTemplates: projectTemplateResource.uri
       });
     } catch (error) {
       logger.error('Failed to initialize resources:', error);
@@ -272,7 +282,8 @@ class WyndMcpServer {
       'wynd://workspace',
       'wynd://project',
       'wynd://document',
-      'wynd://error'
+      'wynd://error',
+      'wynd://projectTemplates'
     ];
   }
   
