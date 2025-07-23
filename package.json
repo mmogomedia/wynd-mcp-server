@@ -1,6 +1,6 @@
 {
   "name": "@mmogomedia/wynd-mcp-server",
-  "version": "1.1.0",
+  "version": "1.3.0",
   "description": "WYND Project Management MCP Server - Provides tools and resources for interacting with the WYND Project Management Software, enabling AI assistants to manage workspaces, projects, tasks, and user profiles programmatically.",
   "main": "build/index.js",
   "type": "module",
