@@ -11,6 +11,7 @@ A Model Context Protocol (MCP) server that provides tools and resources for inte
 - **Task Management**: Create, assign, and track tasks
 - **Document Management**: Create and manage project documentation
 - **Error Tracking**: Track and manage application errors
+- **Prompt Library Management**: Create, organize, and manage AI prompts with categories, tags, and usage tracking
 - **TypeScript Support**: Fully typed API and resources
 - **Modular Architecture**: Clean separation of concerns
 - **Environment Configuration**: Easy configuration via environment variables
@@ -133,6 +134,7 @@ The following resources are available through the MCP server:
 - `wynd://projects` - Project management
 - `wynd://documents` - Document management
 - `wynd://errors` - Error tracking
+- `wynd://prompts` - Prompt library management
 
 ## 🤝 Contributing
 
@@ -272,6 +274,52 @@ WYND_API_TOKEN=your-token-here DEFAULT_PROJECT_ID=your-project-id-here npx @mmog
 - `list_agents` - Get agents (filtered by project, type, status, etc.)
 - `update_agent_status` - Update the status of an agent
 
+## Prompt Library
+
+The WYND MCP server includes a comprehensive prompt library management system that allows you to create, organize, and manage AI prompts for various use cases.
+
+### What are Prompts?
+
+Prompts are reusable templates for AI interactions that can be:
+- **Structured**: Use variables like `{{variable_name}}` for dynamic content
+- **Categorized**: Organize prompts by categories (e.g., "Code Review", "Content Creation", "Analysis")
+- **Tagged**: Add tags for easy searching and filtering
+- **Versioned**: Track changes and maintain prompt history
+- **Shared**: Share prompts with team members or workspaces
+- **Tracked**: Monitor usage analytics and performance
+
+### Prompt Features
+
+- **Variable Support**: Use `{{variable_name}}` syntax for dynamic content
+- **Categories**: Organize prompts into logical groups
+- **Tags**: Add multiple tags for easy discovery
+- **Versioning**: Track prompt changes and maintain history
+- **Usage Analytics**: Monitor how prompts are used and their effectiveness
+- **Sharing**: Share prompts with team members or make them public
+- **Collections**: Group related prompts into collections
+- **Search**: Find prompts by content, title, tags, or category
+
+### Prompt Structure
+
+```typescript
+interface Prompt {
+  id: string;
+  workspace_id: string;
+  title: string;
+  description: string | null;
+  content: string;
+  category_id: string | null;
+  tags: string[];
+  variables: Record<string, any>;
+  version: number;
+  parent_prompt_id: string | null;
+  is_public: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+```
+
 ## Available Resources
 
 The server provides the following resources for accessing WYND data:
@@ -324,6 +372,52 @@ The server provides the following resources for accessing WYND data:
   "category_id": "category-789",
   "tags": ["code-review", "development"],
   "variables": {
+    "criteria": {
+      "type": "string",
+      "description": "Review criteria"
+    }
+  }
+}
+```
+
+### Searching Prompts
+
+```javascript
+// Search prompts by content or title
+{
+  "query": "code review",
+  "workspace_id": "workspace-123"
+}
+```
+
+### Getting Prompts by Category
+
+```javascript
+// Get all prompts in a specific category
+{
+  "category_id": "category-789",
+  "workspace_id": "workspace-123"
+}
+```
+
+### Tracking Prompt Usage
+
+```javascript
+// Track when a prompt is used
+{
+  "prompt_id": "prompt-123",
+  "project_id": "project-456",
+  "execution_time_ms": 1500,
+  "success": true,
+  "input_variables": {
+    "criteria": "security vulnerabilities"
+  },
+  "output_result": {
+    "issues_found": 3,
+    "severity": "medium"
+  }
+}
+```
     "criteria": {
       "type": "string",
       "description": "Review criteria"

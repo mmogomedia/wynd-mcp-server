@@ -1,4 +1,4 @@
-import { Resource } from '@modelcontextprotocol/sdk';
+import { Resource } from './base.js';
 import { api } from '../../api/endpoints/index.js';
 import { Document, ListParams } from '../../api/types/index.js';
 

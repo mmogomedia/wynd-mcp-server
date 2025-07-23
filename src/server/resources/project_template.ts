@@ -1,15 +1,12 @@
-import { Resource } from '@modelcontextprotocol/sdk';
+import { Resource } from './base.js';
 
 const WEB_API_URL = process.env.WEB_API_URL || 'http://localhost:3000';
 
-export class ProjectTemplateResource extends Resource {
-  constructor() {
-    super('wynd://project-templates');
-  }
-
-  get uri() {
-    return 'wynd://project-templates';
-  }
+export class ProjectTemplateResource implements Resource {
+  public readonly uri = 'wynd://project-templates';
+  public readonly name = 'project-templates';
+  public readonly description = 'Project template management resource';
+  public isPublic = false;
 
   // List all templates
   async list(ctx: any) {

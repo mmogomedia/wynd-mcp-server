@@ -4,6 +4,7 @@ import { DocumentResource } from './resources/document.js';
 import { ErrorResource } from './resources/error.js';
 import { TaskResource } from './resources/task.js';
 import { ProjectTemplateResource } from './resources/project_template.js';
+import { PromptResource } from './resources/prompt.js';
 import { HttpServerTransport } from './transport/http.js';
 import { config } from '../config/index.js';
 import logger from '../utils/logger.js';
@@ -153,6 +154,7 @@ class WyndMcpServer {
       const errorResource = new ErrorResource();
       const taskResource = new TaskResource();
       const projectTemplateResource = new ProjectTemplateResource();
+      const promptResource = new PromptResource();
       
       // Check if the server has a resource method
       if (typeof this.server.resource === 'function') {
@@ -162,6 +164,7 @@ class WyndMcpServer {
         this.server.resource(errorResource.uri, errorResource);
         this.server.resource(taskResource.uri, taskResource);
         this.server.resource(projectTemplateResource.uri, projectTemplateResource);
+        this.server.resource(promptResource.uri, promptResource);
       } else {
         // Fallback to direct property assignment if resource method doesn't exist
         this.server.workspaces = workspaceResource;
@@ -170,6 +173,7 @@ class WyndMcpServer {
         this.server.errors = errorResource;
         this.server.tasks = taskResource;
         this.server.projectTemplates = projectTemplateResource;
+        this.server.prompts = promptResource;
       }
       
       logger.info('Registered resources:', {
@@ -178,7 +182,8 @@ class WyndMcpServer {
         documents: documentResource.uri,
         errors: errorResource.uri,
         tasks: taskResource.uri,
-        projectTemplates: projectTemplateResource.uri
+        projectTemplates: projectTemplateResource.uri,
+        prompts: promptResource.uri
       });
     } catch (error) {
       logger.error('Failed to initialize resources:', error);
@@ -283,7 +288,8 @@ class WyndMcpServer {
       'wynd://project',
       'wynd://document',
       'wynd://error',
-      'wynd://projectTemplates'
+      'wynd://projectTemplates',
+      'wynd://prompts'
     ];
   }
   
