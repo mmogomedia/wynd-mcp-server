@@ -31,7 +31,7 @@ const logger = winston.createLogger({
     winston.format.splat(),
     winston.format.json()
   ),
-  defaultMeta: { service: 'wynd-mcp-server' },
+  defaultMeta: { service: 'wynd' },
   transports: [
     // Console transport for development
     new winston.transports.Console({

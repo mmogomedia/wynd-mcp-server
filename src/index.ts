@@ -59,11 +59,14 @@ async function startServer() {
       log_level: config.server.logLevel,
     });
 
-    // Start the server
-    await wyndMcpServer.start();
+    // Determine transport type - use stdio for MCP clients, http for standalone
+    const transport = process.env.MCP_TRANSPORT || 'stdio';
+    
+    // Start the server with appropriate transport
+    await wyndMcpServer.start(transport as 'http' | 'stdio');
     
     // Log successful startup
-    logger.info(`WYND MCP Server is running in ${config.env} mode`);
+    logger.info(`WYND MCP Server is running in ${config.env} mode with ${transport} transport`);
     
   } catch (error) {
     logger.error('Failed to start WYND MCP Server:', error);

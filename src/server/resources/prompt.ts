@@ -4,12 +4,14 @@ import { Prompt, ListParams } from '../../api/types/index.js';
 
 /**
  * Prompt resource handler for the MCP server
+ * Provides comprehensive AI prompt library management for organizing, sharing, and utilizing reusable AI prompts.
+ * Supports categorization, tagging, versioning, and usage analytics for optimal prompt management.
  */
 export class PromptResource implements Resource {
   // Resource interface implementation
   public readonly uri = 'wynd://prompts';
   public readonly name = 'prompts';
-  public readonly description = 'Prompt library management resource';
+  public readonly description = 'Comprehensive AI prompt library management resource for creating, organizing, and sharing reusable AI prompts. Supports categorization, tagging, variable substitution, versioning, usage tracking, and collaborative prompt development.';
   
   // Prompts are private by default (require authentication)
   public isPublic = false;

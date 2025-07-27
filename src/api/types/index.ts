@@ -38,10 +38,25 @@ export interface Project extends BaseEntity {
 }
 
 /**
+ * Phase related types
+ */
+export interface Phase extends BaseEntity {
+  project_id: string;
+  title: string;
+  description: string | null;
+  status: 'planning' | 'active' | 'completed' | 'on_hold';
+  order: number;
+  start_date: string | null;
+  end_date: string | null;
+  color?: string;
+}
+
+/**
  * Task related types
  */
 export interface Task extends BaseEntity {
   project_id: string;
+  phase_id?: string | null;
   title: string;
   description: string | null;
   status: 'todo' | 'in_progress' | 'done' | 'blocked';

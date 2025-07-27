@@ -6,12 +6,14 @@ import logger from '../../utils/logger.js';
 
 /**
  * Project resource handler for the MCP server
+ * Provides read-only access to project information including project details, statistics, and related data.
+ * Projects cannot be created, updated, or deleted through this MCP server for security reasons.
  */
 export class ProjectResource implements Resource {
   // Resource interface implementation
   public readonly uri = 'wynd://projects';
   public readonly name = 'projects';
-  public readonly description = 'Project management resource';
+  public readonly description = 'Read-only project management resource for accessing project information, statistics, and metadata. Supports listing all projects and retrieving detailed project information including tasks, documents, and project stats.';
   
   // Make projects private by default (only accessible with valid token)
   public isPublic = false;
@@ -68,84 +70,17 @@ export class ProjectResource implements Resource {
     }
   }
 
+  // Projects are read-only - create, update, and delete operations are not supported
   async create(data: Omit<Project, 'id' | 'created_at' | 'updated_at'>): Promise<Project> {
-    try {
-      // Required fields validation
-      if (!data.title) {
-        throw new Error('Project title is required');
-      }
-      
-      // If no workspace_id is provided and we have a default project, use its workspace
-      if (!data.workspace_id) {
-        const defaultProjectId = this.getDefaultProjectId();
-        if (defaultProjectId) {
-          const defaultProject = await this.read(`wynd://projects/${defaultProjectId}`);
-          if (defaultProject) {
-            data.workspace_id = defaultProject.workspace_id;
-            logger.debug(`Using workspace from default project: ${data.workspace_id}`);
-          }
-        }
-      }
-      
-      // Default values with required fields
-      const projectData: Omit<Project, 'id' | 'created_at' | 'updated_at'> = {
-        title: data.title,
-        description: data.description || null, // Match the Project interface which expects string | null
-        status: data.status || 'active',
-        workspace_id: data.workspace_id || null, // Match the Project interface which expects string | null
-        owner_id: data.owner_id || 'system', // Default owner
-      };
-      
-      // Call the API to create the project
-      return await api.projects.create(projectData);
-    } catch (error) {
-      console.error('Error creating project:', error);
-      throw error;
-    }
+    throw new Error('Project creation is not supported - projects are read-only');
   }
 
   async update(uri: string, data: Partial<Project>): Promise<Project | null> {
-    try {
-      const id = uri.split('/').pop();
-      if (!id) {
-        throw new Error(`Invalid project URI: ${uri}`);
-      }
-      
-      // Get the existing project
-      const existing = await this.read(uri);
-      if (!existing) {
-        throw new Error(`Project with URI ${uri} not found`);
-      }
-      
-      // Only allow certain fields to be updated
-      const allowedUpdates: Partial<Omit<Project, 'id' | 'created_at' | 'updated_at'>> = {
-        title: data.title,
-        description: data.description,
-        status: data.status,
-        workspace_id: data.workspace_id,
-      };
-      
-      // Call the API to update the project
-      return await api.projects.update(id, allowedUpdates);
-    } catch (error) {
-      logger.error(`Error updating project with URI ${uri}:`, error);
-      return null;
-    }
+    throw new Error('Project updates are not supported - projects are read-only');
   }
 
   async delete(uri: string): Promise<void> {
-    try {
-      const id = uri.split('/').pop();
-      if (!id) {
-        throw new Error(`Invalid project URI: ${uri}`);
-      }
-      
-      // Call the API to delete the project
-      await api.projects.delete(id);
-    } catch (error) {
-      console.error(`Error deleting project with URI ${uri}:`, error);
-      throw error;
-    }
+    throw new Error('Project deletion is not supported - projects are read-only');
   }
 
   // Additional project-specific methods

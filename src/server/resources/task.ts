@@ -5,11 +5,13 @@ import { config } from '../../config/index.js';
 
 /**
  * Task resource handler for the MCP server
+ * Provides comprehensive task management capabilities including listing, creating, updating, and deleting tasks.
+ * Tasks are automatically filtered to show 'in_progress' status by default unless otherwise specified.
  */
 export class TaskResource implements Resource {
   public readonly uri = 'wynd://tasks';
   public readonly name = 'tasks';
-  public readonly description = 'Task management resource';
+  public readonly description = 'Comprehensive task management resource for creating, reading, updating, and deleting project tasks. Supports filtering by status, priority, assignee, and project. Default filter shows in-progress tasks only.';
   public isPublic = false;
 
   async list(params?: ListParams): Promise<Task[]> {
@@ -17,9 +19,14 @@ export class TaskResource implements Resource {
       if (!params) {
         params = {
           project_id: config.project.defaultProjectId,
+          status: 'in_progress', // Default filter to in_progress tasks
         };
       } else {
         params.project_id = config.project.defaultProjectId;
+        // If no status is specified, default to in_progress
+        if (!params.status) {
+          params.status = 'in_progress';
+        }
       }
       const response = await api.tasks.list(params);
       return response.data || [];

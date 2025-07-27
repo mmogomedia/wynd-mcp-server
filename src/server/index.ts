@@ -1,10 +1,11 @@
-import { WorkspaceResource } from './resources/workspace.js';
+import { ContextResource } from './resources/context.js';
 import { ProjectResource } from './resources/project.js';
+import { PhaseResource } from './resources/phase.js';
 import { DocumentResource } from './resources/document.js';
 import { ErrorResource } from './resources/error.js';
 import { TaskResource } from './resources/task.js';
-import { ProjectTemplateResource } from './resources/project_template.js';
 import { PromptResource } from './resources/prompt.js';
+import { tools } from './tools/index.js';
 import { HttpServerTransport } from './transport/http.js';
 import { config } from '../config/index.js';
 import logger from '../utils/logger.js';
@@ -13,7 +14,6 @@ import logger from '../utils/logger.js';
 type ServerConstructor = new (options: { 
   name: string; 
   version: string; 
-  description: string 
 }) => any;
 
 type StdioTransportConstructor = new () => any;
@@ -91,7 +91,7 @@ async function loadSdk(): Promise<{
 
 // Define the Server type from the SDK
 type ServerType = {
-  new (options: { name: string; version: string; description: string }): any;
+  new (options: { name: string; version: string }): any;
   prototype: any;
 };
 
@@ -125,9 +125,18 @@ class WyndMcpServer {
         // Initialize the MCP server
         this.server = new this.serverClass({
           name: 'wynd',
-          version: '1.1.0',
-          description: 'WYND Project Management MCP Server - Provides tools and resources for interacting with the WYND Project Management Software',
+          version: '1.5.1',
         });
+        
+        // Register capabilities after creation
+        if (typeof this.server.registerCapabilities === 'function') {
+          this.server.registerCapabilities({
+            tools: {},
+            resources: {},
+            prompts: {},
+            logging: {}
+          });
+        }
         
         // Initialize resources
         this.initializeResources();
@@ -139,6 +148,65 @@ class WyndMcpServer {
   }
   
   /**
+   * Initialize all tools using MCP SDK request handlers
+   */
+  private async initializeTools(): Promise<void> {
+    if (!this.server) {
+      throw new Error('Server not initialized');
+    }
+    
+    try {
+      // Import MCP SDK schemas
+      const { ListToolsRequestSchema, CallToolRequestSchema } = await import('@modelcontextprotocol/sdk/types.js');
+      
+      // Register tools/list handler
+      this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+        return {
+          tools: tools.map(tool => ({
+            name: tool.name,
+            description: tool.description,
+            inputSchema: tool.inputSchema
+          }))
+        };
+      });
+
+      // Register tools/call handler
+      this.server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
+        const { name, arguments: args } = request.params;
+        
+        const tool = tools.find(t => t.name === name);
+        if (!tool) {
+          throw new Error(`Tool '${name}' not found`);
+        }
+        
+        try {
+          const result = await tool.handler(args || {});
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(result, null, 2)
+              }
+            ]
+          };
+        } catch (error) {
+          logger.error(`Error executing tool '${name}':`, error);
+          throw error;
+        }
+      });
+      
+      logger.info('Registered tools:', {
+        count: tools.length,
+        tools: tools.map(t => t.name)
+      });
+    } catch (error) {
+      logger.error('Failed to initialize tools:', error);
+      // Don't throw error - continue without tools for now
+      logger.warn('Continuing without tools functionality');
+    }
+  }
+
+  /**
    * Initialize all resources
    */
   private initializeResources(): void {
@@ -147,42 +215,42 @@ class WyndMcpServer {
     }
     
     try {
-      // Register all resources with the server
-      const workspaceResource = new WorkspaceResource();
+      // Register all resources with the server, including context for project ID visibility
+      const contextResource = new ContextResource();
       const projectResource = new ProjectResource();
+      const phaseResource = new PhaseResource();
       const documentResource = new DocumentResource();
       const errorResource = new ErrorResource();
       const taskResource = new TaskResource();
-      const projectTemplateResource = new ProjectTemplateResource();
       const promptResource = new PromptResource();
       
       // Check if the server has a resource method
       if (typeof this.server.resource === 'function') {
-        this.server.resource(workspaceResource.uri, workspaceResource);
+        this.server.resource(contextResource.uri, contextResource);
         this.server.resource(projectResource.uri, projectResource);
+        this.server.resource(phaseResource.uri, phaseResource);
         this.server.resource(documentResource.uri, documentResource);
         this.server.resource(errorResource.uri, errorResource);
         this.server.resource(taskResource.uri, taskResource);
-        this.server.resource(projectTemplateResource.uri, projectTemplateResource);
         this.server.resource(promptResource.uri, promptResource);
       } else {
         // Fallback to direct property assignment if resource method doesn't exist
-        this.server.workspaces = workspaceResource;
+        this.server.context = contextResource;
         this.server.projects = projectResource;
+        this.server.phases = phaseResource;
         this.server.documents = documentResource;
         this.server.errors = errorResource;
         this.server.tasks = taskResource;
-        this.server.projectTemplates = projectTemplateResource;
         this.server.prompts = promptResource;
       }
       
       logger.info('Registered resources:', {
-        workspaces: workspaceResource.uri,
+        context: contextResource.uri,
         projects: projectResource.uri,
+        phases: phaseResource.uri,
         documents: documentResource.uri,
         errors: errorResource.uri,
         tasks: taskResource.uri,
-        projectTemplates: projectTemplateResource.uri,
         prompts: promptResource.uri
       });
     } catch (error) {
@@ -225,6 +293,9 @@ class WyndMcpServer {
         await this.server.connect(stdioTransport);
         logger.info('Server running in stdio mode');
       }
+      
+      // Initialize tools after connection is established
+      await this.initializeTools();
       
       return this.server;
     } catch (error) {
@@ -277,18 +348,13 @@ class WyndMcpServer {
    * Get all registered resource URIs
    */
   private getResourceUris(): string[] {
-    // This is a simplified implementation
-    // In a real implementation, you would get this from the server instance
     return [
-      'wynd://workspaces',
+      'wynd://context',
       'wynd://projects',
+      'wynd://phases',
       'wynd://documents',
       'wynd://errors',
-      'wynd://workspace',
-      'wynd://project',
-      'wynd://document',
-      'wynd://error',
-      'wynd://projectTemplates',
+      'wynd://tasks',
       'wynd://prompts'
     ];
   }
@@ -314,7 +380,7 @@ class WyndMcpServer {
    */
   private getServerInfo(): { name: string; version: string; description: string } {
     return {
-      name: 'wynd-mcp-server',
+      name: 'wynd',
       version: '1.0.0',
       description: 'WYND Project Management MCP Server'
     };

@@ -6,7 +6,7 @@ dotenv.config();
 
 // Define the schema for environment variables
 const envSchema = z.object({
-  WYND_API_URL: z.string().url().default('https://wynd.mmogomedia.com'),
+  WYND_API_URL: z.string().url().default('https://wynd.ltd'),
   WYND_API_TOKEN: z.string().min(1, 'WYND_API_TOKEN is required'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.string().default('3000'),

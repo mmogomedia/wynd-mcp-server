@@ -4,12 +4,14 @@ import { Document, ListParams } from '../../api/types/index.js';
 
 /**
  * Document resource handler for the MCP server
+ * Provides comprehensive document management capabilities for project documentation, files, and knowledge base articles.
+ * Supports full CRUD operations with automatic project association and content management.
  */
 export class DocumentResource implements Resource {
   // Resource interface implementation
   public readonly uri = 'wynd://documents';
   public readonly name = 'documents';
-  public readonly description = 'Document management resource';
+  public readonly description = 'Comprehensive document management resource for creating, reading, updating, and deleting project documentation. Supports markdown content, file attachments, categorization, and full-text search capabilities.';
   
   // Documents are private by default (require authentication)
   public isPublic = false;

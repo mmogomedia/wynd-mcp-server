@@ -4,13 +4,14 @@ import { ErrorLog, ListParams } from '../../api/types/index.js';
 
 /**
  * Error tracking resource handler for the MCP server
- * This resource is public and accessible to everyone
+ * Provides comprehensive error logging and tracking capabilities for application debugging and monitoring.
+ * This resource is public and accessible to everyone for transparency and collaborative debugging.
  */
 export class ErrorResource implements Resource {
   // Resource interface implementation
   public readonly uri = 'wynd://errors';
   public readonly name = 'errors';
-  public readonly description = 'Public error tracking resource';
+  public readonly description = 'Comprehensive error tracking and logging resource for application debugging, monitoring, and issue resolution. Supports error categorization, stack trace analysis, and solution tracking. Public access for collaborative debugging.';
   
   // Make all errors public by default
   public isPublic = true;

@@ -3,6 +3,7 @@ import { config } from '../../config/index.js';
 import type {
   Workspace,
   Project,
+  Phase,
   Task,
   Document,
   ErrorLog,
@@ -59,6 +60,38 @@ export const projects = {
     
   getStats: (projectId: string): Promise<any> => 
     wyndApi.get(`/api/projects/${projectId}/stats`),
+};
+
+/**
+ * Phases API endpoints
+ */
+export const phases = {
+  list: (params?: ListParams): Promise<ListResponse<Phase>> => {
+    // Always filter by default project unless explicitly overridden
+    const filteredParams = {
+      ...params,
+      project_id: params?.project_id || config.project.defaultProjectId,
+    };
+    return wyndApi.get('/api/phases', { params: filteredParams });
+  },
+    
+  get: (id: string): Promise<Phase> => 
+    wyndApi.get(`/api/phases/${id}`),
+    
+  create: (data: Omit<Phase, 'id' | 'created_at' | 'updated_at'>): Promise<Phase> => {
+    // Ensure phase is created in the default project if no project_id is specified
+    const phaseData = {
+      ...data,
+      project_id: data.project_id || config.project.defaultProjectId,
+    };
+    return wyndApi.post('/api/phases', phaseData);
+  },
+    
+  update: (id: string, data: Partial<Omit<Phase, 'id' | 'created_at' | 'updated_at'>>): Promise<Phase> => 
+    wyndApi.put(`/api/phases/${id}`, data),
+    
+  delete: (id: string): Promise<void> => 
+    wyndApi.delete(`/api/phases/${id}`),
 };
 
 /**
@@ -179,6 +212,7 @@ export const prompts = {
 export const api = {
   workspaces,
   projects,
+  phases,
   tasks,
   documents,
   errors,
